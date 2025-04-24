@@ -1,0 +1,10 @@
+Parallel_Background_Subtraction_MPI/
+│
+├── main.py
+├── mpi_processing/
+│   └── background_subtraction.py
+├── utils/
+│   └── image_utils.py
+├── input/               # Extracted frames will be saved here
+├── output/              # Foreground masks and background image will be saved here
+└── requirements.txt
