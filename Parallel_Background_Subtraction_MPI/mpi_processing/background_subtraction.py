@@ -23,17 +23,13 @@ def parallel_background_subtraction(comm, rank, size):
     if rank == 0:
         images = load_images("input/")
         background = estimate_background(images)
-
-        # 🟠 ✅ Convert background to grayscale here (your requested fix):
         background_gray = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
-        save_image(background_gray, "output/estimated_background.jpg")  # Save as black & white (grayscale)
-
+        save_image(background_gray, "output/estimated_background.jpg")
         chunks = split_list(images, size)
     else:
         chunks = None
         background = None
 
-    # Broadcast the original color background (needed for foreground subtraction):
     background = comm.bcast(background, root=0)
     local_images = comm.scatter(chunks, root=0)
 
@@ -48,8 +44,7 @@ def parallel_background_subtraction(comm, rank, size):
     gathered_results = comm.gather(processed_images, root=0)
 
     if rank == 0:
-        if not os.path.exists("output/foreground"):
-            os.makedirs("output/foreground")
+        os.makedirs("output/foreground", exist_ok=True)
         for process_results in gathered_results:
             for mask_img, filename in process_results:
                 save_image(mask_img, os.path.join("output/foreground", filename))
